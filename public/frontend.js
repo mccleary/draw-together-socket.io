@@ -3,6 +3,8 @@ var canvas = document.getElementById('the-canvas');
 var ctx = canvas.getContext('2d');
 //canDraw is a boolean value to determine if you can draw
 var canDraw;
+var startXPosition;
+var startYPosition;
 
 
 // ctx.beginPath();
@@ -18,34 +20,56 @@ canvas.addEventListener('mousedown', function eventHandler(event) {
 
 //Actual drawing function
 function draw(mouseX, mouseY) {
+  ctx.strokeStyle = 'red';
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = 5;
+
   ctx.beginPath();
-  ctx.fillStyle = "red";
-  ctx.ellipse(mouseX, mouseY, 20 , 20 , 0, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.moveTo = (100, 150);
+  // ctx.lineTo(mouseX, mouseY, 20 , 20 , 0, 0, Math.PI * 2);
+  ctx.lineTo(200, 200);
+  ctx.closePath();
+  ctx.stroke();
 }
 
+
+function drawLine(obj){
+  ctx.strokeStyle = 'red';
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = 5;
+  console.log('obj', obj);
+
+  ctx.beginPath();
+  // console.log(obj.startPoint.x);
+  // console.log(obj.endPoint.x);
+
+  ctx.moveTo(obj.startPoint.x, obj.startPoint.y);
+  // ctx.lineTo(mouseX, mouseY, 20 , 20 , 0, 0, Math.PI * 2);
+  ctx.lineTo(obj.endPoint.x,obj.endPoint.y);
+  ctx.closePath();
+  ctx.stroke();
+}
 socket.on('draw', function(coords) {
   console.log(coords);
-  console.log(coords[0]);
-  console.log(coords[1]);
-  draw(coords[0], coords[1]);
+  drawLine(coords);
 });
 
 canvas.addEventListener('mousemove', function eventHandler(event) {
 
 
-//If canDraw is true, you can draw on canvas
-if(canDraw) {
-  var mouseX = event.pageX - this.offsetLeft;
-  // console.log(mouseX);
-  var mouseY = event.pageY - this.offsetTop;
-  // console.log(mouseY);
-  draw(mouseX, mouseY);
-  var coords = [mouseX, mouseY];
-  socket.emit('draw', coords);
+  //If canDraw is true, you can draw on canvas
+  if(canDraw) {
 
-
-}
+    var coords = {'startPoint' : { 'x' : startXPosition, 'y' : startYPosition}, 'endPoint' : {'x' : event.pageX - this.offsetLeft, 'y' : event.pageY - this.offsetTop}};
+    // console.log('drawing');
+    if(startXPosition && startYPosition){
+      // console.log('draw line');
+      drawLine(coords);
+      socket.emit('draw', coords);
+    }
+  }
+  startXPosition = event.pageX - this.offsetLeft;
+  startYPosition = event.pageY - this.offsetTop;
 
 });
 

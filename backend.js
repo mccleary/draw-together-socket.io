@@ -14,9 +14,9 @@ io.on('connection', function(socket){
     console.log('user disconnected');
   });
 
-  socket.on('draw', function(coords) {
-    console.log(coords);
-    socket.broadcast.emit('draw', coords);
+  socket.on('draw', function(obj) {
+    // console.log(coords.endPoint.x);
+    socket.broadcast.emit('draw', obj);
   });
 });
 
